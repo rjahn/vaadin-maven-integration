@@ -3,14 +3,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.vaadin</groupId>
+  <groupId>at.ganzleicht.vaadin</groupId>
   <artifactId>vaadin-parent</artifactId>
   <packaging>pom</packaging>
   <name>Vaadin parent POM</name>
   <version>1.1.0</version>
-  <url>http://vaadin.com</url>
+  
+  <url>https://github.com/rjahn/vaadin</url>
   <description>
-      A parent POM for all artifacts by Vaadin Ltd.
+      A parent POM for all vaadin artifacts.
   </description>
   <developers>
     <developer>
@@ -21,11 +22,14 @@
       <organizationUrl>http://vaadin.com</organizationUrl>
       <timezone>+2</timezone>
     </developer>
+    <developer>
+      <name>René Jahn</name>
+    </developer>
   </developers>
   <scm>
-    <url>https://github.com/vaadin/maven-integration</url>
-    <connection>https://github.com/vaadin/maven-integration.git</connection>
-    <developerConnection>https://github.com/vaadin/maven-integration.git</developerConnection>
+    <url>https://github.com/rjahn/vaadin-maven-integration</url>
+    <connection>https://github.com/rjahn/vaadin-maven-integration.git</connection>
+    <developerConnection>https://github.com/rjahn/vaadin-maven-integration.git</developerConnection>
   </scm>
   <licenses>
     <license>
@@ -34,18 +38,6 @@
       <url>https://www.apache.org/licenses/LICENSE-2.0</url>
     </license>
   </licenses>
-  <distributionManagement>
-    <repository>
-      <id>vaadin-staging</id>
-      <name>Vaadin release staging repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>vaadin-snapshots</id>
-      <name>Vaadin snapshot repository</name>
-      <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -53,33 +45,8 @@
   <profiles>
     <profile>
       <id>release</id>
-      <properties>
-        <staging.server.id>vaadin-staging</staging.server.id>
-        <staging.server.url>https://oss.sonatype.org/</staging.server.url>
-      </properties>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0.0</version>
-            <configuration>
-              <quiet>true</quiet>
-            </configuration>
-            <executions>
-              <execution>
-                <phase>initialize</phase>
-                <goals>
-                  <goal>read-project-properties</goal>
-                </goals>
-                <configuration>
-                  <files>
-                    <file>${gpg.passphrase.file}</file>
-                  </files>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-enforcer-plugin</artifactId>
@@ -107,6 +74,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -118,95 +86,15 @@
             </executions>
           </plugin>
           <plugin>
-             <groupId>org.sonatype.plugins</groupId>
-             <artifactId>nexus-staging-maven-plugin</artifactId>
-             <version>1.6.8</version>
-             <extensions>true</extensions>
-             <configuration>
-               <nexusUrl>${staging.server.url}</nexusUrl>
-               <serverId>${staging.server.id}</serverId>
-             </configuration>
-           </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>prerelease</id>
-      <properties>
-        <staging.server.id>vaadin-prerelease-staging</staging.server.id>
-        <!-- staging.server.url is set by the build environment profile -->
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.7.0</version>
+            <extensions>true</extensions>
             <configuration>
-              <quiet>true</quiet>
+              <publishingServerId>sonatype-nexus-staging</publishingServerId>
+              <deploymentName>${project.artifactId}</deploymentName>
             </configuration>
-            <executions>
-              <execution>
-                <phase>initialize</phase>
-                <goals>
-                  <goal>read-project-properties</goal>
-                </goals>
-                <configuration>
-                  <files>
-                    <file>${gpg.passphrase.file}</file>
-                  </files>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>1.0</version>
-            <executions>
-              <execution>
-                <id>enforce-maven</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireMavenVersion>
-                      <version>(,2.1.0),(2.1.0,2.2.0),(2.2.0,)</version>
-                      <message>
-                        Maven 2.1.0 and 2.2.0 produce incorrect GPG signatures and checksums
-                        respectively.
-                      </message>
-                    </requireMavenVersion>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-             <groupId>org.sonatype.plugins</groupId>
-             <artifactId>nexus-staging-maven-plugin</artifactId>
-             <version>1.6.8</version>
-             <extensions>true</extensions>
-             <configuration>
-               <nexusUrl>${staging.server.url}</nexusUrl>
-               <serverId>${staging.server.id}</serverId>
-             </configuration>
-           </plugin>
         </plugins>
       </build>
     </profile>

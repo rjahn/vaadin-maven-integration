@@ -3,3 +3,4 @@
 /archetypes/*/.project
 /archetypes/*/target
 /target
+/parent/target
