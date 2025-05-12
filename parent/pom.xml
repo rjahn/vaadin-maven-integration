@@ -7,7 +7,7 @@
   <artifactId>vaadin-parent</artifactId>
   <packaging>pom</packaging>
   <name>Vaadin parent POM</name>
-  <version>1.1.0</version>
+  <version>1.1.0.1</version>
   
   <url>https://github.com/rjahn/vaadin</url>
   <description>
@@ -92,7 +92,7 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>sonatype-nexus-staging</publishingServerId>
-              <deploymentName>${project.artifactId}</deploymentName>
+              <deploymentName>vaadin-${project.version}</deploymentName>
             </configuration>
           </plugin>
         </plugins>
